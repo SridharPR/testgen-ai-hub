@@ -63,7 +63,11 @@ const TestPage = () => {
         rating: null
       }]);
       
-      setScenarios(generatedScenarios);
+      // Update the scenarios by appending the new content instead of replacing it
+      setScenarios(prev => {
+        // Add a clear separator between previous and new content
+        return `${prev}\n\n## Custom Requirement: ${savedRequirement}\n${generatedScenarios}`;
+      });
       
       // Clear the requirements text area after submission
       setSpecificRequirements("");
@@ -84,11 +88,12 @@ const TestPage = () => {
     }
     
     try {
+      // Remove the custom requirements parameter since we're consolidating everything
       exportToHtml(
         scenarios, 
         domain || "", 
         testType || "", 
-        customRequirements,
+        undefined,
         rating
       );
       toast.success("Report downloaded successfully");
