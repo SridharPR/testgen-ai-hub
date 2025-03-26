@@ -63,10 +63,10 @@ const TestPage = () => {
         rating: null
       }]);
       
-      // Update the scenarios by appending the new content instead of replacing it
+      // Add only the custom requirement and its scenarios to the main text area,
+      // not duplicating the original scenarios
       setScenarios(prev => {
-        // Add a clear separator between previous and new content
-        return `${prev}\n\n## Custom Requirement: ${savedRequirement}\n${generatedScenarios}`;
+        return `${prev}\n\n## Custom Requirement: ${savedRequirement}\n${generatedScenarios.split('\n').filter(line => !line.includes("# ") && !line.includes("## ")).join('\n')}`;
       });
       
       // Clear the requirements text area after submission
