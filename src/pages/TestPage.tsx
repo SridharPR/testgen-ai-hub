@@ -15,6 +15,8 @@ const TestPage = () => {
   const [scenarios, setScenarios] = useState("");
   const [specificRequirements, setSpecificRequirements] = useState("");
   const [showRating, setShowRating] = useState(false);
+  const [rating, setRating] = useState<number | null>(null);
+  const [customRequirements, setCustomRequirements] = useState<Array<{text: string, rating: number | null}>>([]);
   
   useEffect(() => {
     if (!domain || !testType) {
@@ -47,12 +49,25 @@ const TestPage = () => {
     
     try {
       setIsGenerating(true);
+      const savedRequirement = specificRequirements;
+      
       const generatedScenarios = await generateTestScenarios(
         domain || "",
         testType || "",
         specificRequirements
       );
+      
+      // Add the custom requirement to the tracking array
+      setCustomRequirements(prev => [...prev, {
+        text: savedRequirement,
+        rating: null
+      }]);
+      
       setScenarios(generatedScenarios);
+      
+      // Clear the requirements text area after submission
+      setSpecificRequirements("");
+      
       toast.success("Test scenarios updated based on your requirements");
     } catch (error) {
       console.error("Error generating scenarios:", error);
@@ -69,7 +84,13 @@ const TestPage = () => {
     }
     
     try {
-      exportToHtml(scenarios, domain || "", testType || "");
+      exportToHtml(
+        scenarios, 
+        domain || "", 
+        testType || "", 
+        customRequirements,
+        rating
+      );
       toast.success("Report downloaded successfully");
     } catch (error) {
       console.error("Error downloading report:", error);
@@ -77,8 +98,9 @@ const TestPage = () => {
     }
   };
   
-  const handleRating = (rating: number) => {
-    toast.success(`Thank you for rating ${rating} stars!`);
+  const handleRating = (newRating: number) => {
+    setRating(newRating);
+    toast.success(`Thank you for rating ${newRating} stars!`);
     setShowRating(false);
   };
   
